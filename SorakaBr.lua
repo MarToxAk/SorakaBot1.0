@@ -4,7 +4,7 @@ require 'VPrediction'
 --[[
 SorakaBot Br By MarToxAk
 Teste
-Fun��es da Soraka Bot auto Compra 
+Funções da Soraka Bot auto Compra 
 Auto Up Skill
 --]]
 
@@ -40,14 +40,14 @@ shopList = {
 nextbuyIndex = 1
 lastBuy = 0
 
-buyDelay = 100 --padr�o 100
+buyDelay = 100 --padrão 100
 
 --Sistema de Update
 local AutoUpdate = true
 local SELF = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
-local URL = "https://raw.githubusercontent.com/victorgrego/Bol/master/UnifiedSoraka.lua?"..math.random(100)
+local URL = "https://raw.githubusercontent.com/MarToxAk/SorakaBot1.0/master/SorakaBr.lua?"..math.random(100)
 local UPDATE_TMP_FILE = LIB_PATH.."UNSTmp.txt"
-local versionmessage = "<font color=\"#81BEF7\" >Changelog: Added autobuy option and changed build to spam skills</font>"
+local versionmessage = "<font color=\"#81BEF7\" >Changelog: Nova versão retirada alguns Bugs</font>"
 
 function Update()
   DownloadFile(URL, UPDATE_TMP_FILE, UpdateCallback)
@@ -73,12 +73,12 @@ function UpdateCallback()
         file:write(content)
         file:flush()
         file:close()
-        PrintChat("<font color=\"#81BEF7\" >UnifiedSoraka:</font> <font color=\"#00FF00\">Successfully updated to: v"..Version..". Please reload the script with F9.</font>")
+        PrintChat("<font color=\"#81BEF7\" >SorakaBot:</font> <font color=\"#00FF00\">Update feito  com Sucesso: v"..Version..". Por favor Aperte F9 para recarregar.</font>")
       else
-        PrintChat("<font color=\"#81BEF7\" >UnifiedSoraka:</font> <font color=\"#FF0000\">Error updating to new version (v"..Version..")</font>")
+        PrintChat("<font color=\"#81BEF7\" >SorakaBot:</font> <font color=\"#FF0000\">Erro no Update da nova versão(v"..Version..")</font>")
       end
       elseif (Version ~= nil) and (Version == tonumber(version)) then
-        PrintChat("<font color=\"#81BEF7\" >UnifiedSoraka:</font> <font color=\"#00FF00\">No updates found, latest version: v"..Version.." </font>")
+        PrintChat("<font color=\"#81BEF7\" >SorakaBot:</font> <font color=\"#00FF00\">Nenhuma Atualização  Foi encontrada, essa é a Ultima Versão: v"..Version.." </font>")
       end
     end
   end
@@ -113,57 +113,6 @@ local levelSequence = {_W,_E,_Q,_W,_W,_R,_W,_E,_W,_E,_R,_E,_E,_Q,_Q,_R,_Q,_Q}
 --Target Selector
 ts = TargetSelector(TARGET_LOW_HP, 1000, DAMAGE_MAGIC, true)
 
---[[ ultMode notes:
-1 = ult when Soraka is low/about to die, under ultThreshold% of hp [selfish ult]
-2 = ult when ally is low/about to die, under ultThreshold% of hp [lane partner ult]
-3 = ult when total missing health of entire team exceeds ultThreshold (ie 50% of entire team health is missing)
--]]
-
---[[ Main Functions ]]--
-
--- Soraka performs starcall to help push/farm a lane or harrass enemy champions (or both)
-
-
--- Soraka Heals the nearby most injured ally or herself, assumes heal is ready to be used
-
-
-
-
--- Soraka Infuses the most mana deprived ally donating them mana
-
-
---[[ Helper Functions ]]--
-
-
---[[ Helper Functions ]]--
--- Return player based on their resource or stat
-function GetPlayer(team, includeDead, includeSelf, distanceTo, distanceAmount, resource)
-  local target = nil
-
-  for i=1, heroManager.iCount do
-    local member = heroManager:GetHero(i)
-
-    if member ~= nil and member.type == "AIHeroClient" and member.team == team and (member.dead ~= true or includeDead) then
-      if member.charName ~= player.charName or includeSelf then
-        if distanceAmount == GLOBAL_RANGE or member:GetDistance(distanceTo) <= distanceAmount then
-          if target == nil then target = member end
-
-          if resource == "health" then --least health
-            if member.health < target.health then target = member end
-          elseif resource == "mana" then --least mana
-            if member.mana < target.mana then target = member end
-          elseif resource == "AD" then --highest AD
-            if member.totalDamage > target.totalDamage then target = member end
-          elseif resource == NO_RESOURCE then
-            return member -- as any member is eligible
-          end
-        end
-      end
-    end
-  end
-
-  return target
-end
 
 function buy()
   if InFountain() or player.dead then
@@ -191,7 +140,7 @@ end
 --draws Menu
 function drawMenu()
   -- Config Menu
-  config = scriptConfig("UnifiedSoraka", "UnifiedSoraka") 
+  config = scriptConfig("SorakaBot", "SorakaBot") 
 
   config:addParam("enableScript", "Enable Script", SCRIPT_PARAM_ONOFF, true)
   config:addParam("autoBuy", "Auto Buy Items", SCRIPT_PARAM_ONOFF, true)
