@@ -47,7 +47,7 @@ local AutoUpdate = true
 local SELF = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
 local URL = "https://raw.githubusercontent.com/MarToxAk/SorakaBot1.0/master/SorakaBr.lua?"..math.random(100)
 local UPDATE_TMP_FILE = LIB_PATH.."UNSTmp.txt"
-local versionmessage = "<font color=\"#81BEF7\" >Changelog: Nova versão retirada alguns Bugs</font>"
+local versionmessage = "<font color=\"#81BEF7\" >Changelog: Adicionado  Auto Farm Fase de teste ^^</font>"
 
 function Update()
   DownloadFile(URL, UPDATE_TMP_FILE, UpdateCallback)
@@ -108,7 +108,7 @@ local isRecalling = false
 local RECALL_DELAY = 0.5
 
 -- Auto Level
-local levelSequence = {_W,_E,_Q,_W,_W,_R,_W,_E,_W,_E,_R,_E,_E,_Q,_Q,_R,_Q,_Q}
+local levelSequence1 = {_W,_E,_W,_Q,_W,_R,_W,_Q,_W,_Q,_R,_Q,_Q,_E,_E,_R,_E,_E}
 
 --Target Selector
 ts = TargetSelector(TARGET_LOW_HP, 1000, DAMAGE_MAGIC, true)
@@ -137,17 +137,135 @@ function buy()
   end
 end
 
---draws Menu
-function drawMenu()
-  -- Config Menu
-  config = scriptConfig("SorakaBot", "SorakaBot") 
+--Menu no Game Soraka Bot
+function __initMenu()
+--Menu do Auto  Ataque Persnoagem inimigos "caso Bot"
+Menu = scriptConfig("[" .. _ScriptName .. "] ".. myHero.charName, "SorakaBot"..myHero.charName)
+Menu.addsubMenu("[" .. myHero.charName.. "] ativaredesativar", "onoff")
+	Menu.onoff.addParam("AutoAtaque", "Ativar Auto Ataque:", SCRIPT_PARAM_ONOFF, true)
+	Menu.onoff.addParam("farm", "Limpa a Line:", SCRIPT_PARAM_ONOFF, true)
 
-  config:addParam("enableScript", "Enable Script", SCRIPT_PARAM_ONOFF, true)
-  config:addParam("autoBuy", "Auto Buy Items", SCRIPT_PARAM_ONOFF, true)
-  config:addParam("autoLevel", "Auto Level", SCRIPT_PARAM_ONOFF, true)
+	--Menu do  Farm Ativa e desativar no menu  acima o tanto de mana que pode usa para farma a line #recomendado Até 70%
+Menu:addSubMenu("[" .. myHero.charName.. "] Farm", "farm")
+  Menu.farm:addParam("useW", "Enable Q (".. SpellTable[_Q].name ..")", SCRIPT_PARAM_ONOFF, true)
+  Menu.farm:addParam("mana", "Min Mana For Lane Clear", SCRIPT_PARAM_SLICE, 0, 0, 100, 0)
+
+Menu.addSubMenu("[" .. myHero.charName.. "] autoBuy", "autoBuy")
+  menu.autoBuy:addParam("autoBuy", "Auto compra Itens", SCRIPT_PARAM_ONOFF, true)
+
+Menu.addSubMenu("[" .. myHero.charName.. "] autoLevel", "Auto Level")
+  menu.autoLevel:addParam("autoLevel1", "Auto level Skills W E W Foco W Cura", SCRIPT_PARAM_ONOFF, true)
+  menu.autoLevel:addParam("", "Embreve Novos Auto Level")
+
+Menu:addSubMenu("[" .. myHero.charName.. "] Combo", "combo")
+  Menu.combo:addParam("useQ", "Enable Q (".. SpellTable[_Q].name ..")", SCRIPT_PARAM_ONOFF, true)
+  Menu.combo:addParam("useE", "Enable E (".. SpellTable[_E].name ..")", SCRIPT_PARAM_ONOFF, true)
+  Menu.combo:addParam("mana", "Min Mana For Combo", SCRIPT_PARAM_SLICE, 0, 0, 100, 0)
+  Menu.combo:addParam("minE", "Minimum targets to use E", SCRIPT_PARAM_SLICE, 1, 1, 4, 0)
+
 
 end
 
+--[[function drawMenu()
+  Config Menu
+  config = scriptConfig("SorakaBot", "SorakaBot")
+  config:addParam("enableScript", "Enable Script", SCRIPT_PARAM_ONOFF, true)
+  config:addParam("autoBuy", "Auto Buy Items", SCRIPT_PARAM_ONOFF, true)
+  config:addParam("autoLevel", "Auto Level", SCRIPT_PARAM_ONOFF, true)
+  config:addParam("Farm", "Auto Farming", SCRIPT_PARAM_ONOFF, true)
+
+end
+]]--
+
+--Outro em teste 
+
+    if target ~= nil and ValidTarget(target) and GetDistance(target) <= SpellTable[_E].range and SpellTable[_E].ready then
+
+        local aoeCastPos, hitChance, castInfo, nTargets
+        if VIP_USER and Menu.prediction.type and Menu.prediction.type == 1 then
+            aoeCastPos, castInfo = Prodiction.GetCircularAOEPrediction(target, SpellTable[_Q].range, SpellTable[_Q].speed, SpellTable[_Q].delay, SpellTable[_Q].width, myHero)
+            hitChance = tonumber(castInfo.hitchance)
+        else
+            aoeCastPos, hitChance, nTargets = VP:GetCircularAOECastPosition(target, SpellTable[_E].delay, SpellTable[_E].width, SpellTable[_E].range, SpellTable[_E].speed, myHero)
+        end
+
+      if GetMode() == 1 then
+            n = Menu.combo.minE
+        else
+            n = Menu.harass.minE
+        end
+
+
+        if GetEnemyCountInPos(aoeCastPos, SpellTable[_E].range) >= n then
+            if VIP_USER and Menu.misc.packet then
+
+                local packet = GenericSpellPacket(_E, aoeCastPos.x, aoeCastPos.z)
+                Packet("S_CAST", packet):send()
+
+            else
+
+                CastSpell(_E, aoeCastPos.x, aoeCastPos.z)
+
+            end
+        end
+
+    end
+
+--Function em teste 
+function __modes()
+
+    carryKey    = Menu.keys.carry
+    harassKey   = Menu.keys.harass
+    farmKey     = Menu.keys.farm
+
+    if carryKey     then Combo(Target)  end -- ACTIVATE CARRY MODE
+    if harassKey    then Harass(Target) end -- ACTIVATE MIXED MODE
+    if farmKey      then Farm()         end -- ACTIVATE CLEAR MODE
+
+
+    if Target ~= nil and ValidTarget(Target) and not Target.canMove and Menu.misc.e then CastE(target, Menu.prediction.e) end
+    
+end
+
+--Combo teste pronto
+function Combo(target) -- CARRY MODE BEHAVIOUS
+
+    if ValidTarget(target) and target ~= nil and target.type == myHero.type then
+
+        if myManaPct() >= Menu.combo.mana and Menu.combo.useQ then CastQ(target, Menu.prediction.q) end
+        if myManaPct() >= Menu.combo.mana and Menu.combo.useE then CastE(target, Menu.prediction.e) end
+        
+
+    end
+    
+
+--Fuction Farm Para Farming  Minions usando o Speel "Q"
+function Farm() -- LANE CLEAR
+
+    enemyMinions:update()
+
+    if not (myManaPct() < Menu.farm.mana) then
+            if SpellTable[_Q].ready then
+        
+        for _, minion in pairs(enemyMinions.objects) do
+            if minion ~= nil and ValidTarget(minion) then
+                if Menu.farm.useW and GetDistance(minion) <= SpellTable[_Q].range then
+                    local pos, hit = GetBestCircularFarmPos(SpellTable[_Q].range, SpellTable[_Q].width, enemyMinions.objects)
+                    if pos ~= nil then
+                        if VIP_USER and Menu.misc.packet then -- PACKET CAST Q
+                            local packet = GenericSpellPacket(_Q, pos.x, pos.z)
+                            Packet("S_CAST", packet):send()
+                        else -- NORMAL CAST Q
+                            CastSpell(_Q, pos.x, pos.z)
+                        end
+                    end
+                end
+            end
+        end
+            end
+    end
+
+end
 
 -- obCreatObj
 function OnCreateObj(obj)
@@ -173,7 +291,7 @@ function OnTick()
   --if(ts.target) then print(ts.target.charName) end
   -- Auto Level
   if config.autoLevel and player.level > GetHeroLeveled() then
-    LevelSpell(levelSequence[GetHeroLeveled() + 1])
+    LevelSpell(levelSequence1[GetHeroLeveled() + 1])
   end
 
   -- Recall Check
@@ -187,7 +305,7 @@ end
 
 function OnLoad()
   player = GetMyHero()
-  drawMenu()
+  __initMenu()
   startingTime = GetTickCount()
   
   VP = VPrediction()
