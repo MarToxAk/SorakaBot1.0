@@ -1,5 +1,3 @@
-local version = "0.2"
-
 require 'VPrediction'
 --[[
 Soraka Rw  By MarTox
@@ -8,56 +6,30 @@ Auto Up Skiil
 --]]
 
 -- Champion Check
-if myHero.charName ~= "Soraka" then return end
+local version = "0.3"
+local TESTVERSION = false
+local AUTOUPDATE = true
+local UPDATE_HOST = "raw.github.com"
+local UPDATE_PATH = "/MarToxAk/SorakaBot1.0/master/sorakabot.lua".."?rand="..math.random(1,10000)
+local UPDATE_FILE_PATH = LIB_PATH.."vPrediction.lua"
+local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
 
-shopList = {
-2037, 2037, 2037
-}
-
-nextbuyIndex = 1
-lastBuy = 0
-
-buyDelay = 100 --default 100
-
---UPDATE SETTINGS
-local AutoUpdate = true
-local SELF = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
-local URL = "https://raw.githubusercontent.com/MarToxAk/SorakaBot1.0/master/sorakabot.lua?"..math.random(100)
-local UPDATE_TMP_FILE = LIB_PATH.."UNSTmp.txt"
-local versionmessage = "<font color=\"#81BEF7\" >Changelog: Added autobuy option and changed build to spam skills</font>"
-
-function Update()
-  DownloadFile(URL, UPDATE_TMP_FILE, UpdateCallback)
-end
-
-function UpdateCallback()
-  file = io.open(UPDATE_TMP_FILE, "rb")
-  if file ~= nil then
-    content = file:read("*all")
-    file:close()
-    os.remove(UPDATE_TMP_FILE)
-    if content then
-      tmp, sstart = string.find(content, "local version = \"")
-      if sstart then
-        send, tmp = string.find(content, "\"", sstart+1)
-      end
-      if send then
-        Version = tonumber(string.sub(content, sstart+1, send-1))
-      end
-      if (Version ~= nil) and (Version > tonumber(version)) and content:find("--EOS--") then
-        file = io.open(SELF, "w")
-      if file then
-        file:writ(content)
-        file:flush()
-        file:close()
-        PrintChat("<font color=\"#81BEF7\" >UnifiedSoraka:</font> <font color=\"#00FF00\">Successfully updated to: v"..Version..". Please reload the script with F9.</font>")
+local function AutoupdaterMsg(msg) print("<font color=\"#6699ff\"><b>VPrediction:</b></font> <font color=\"#FFFFFF\">"..msg..".</font>") end
+if AUTOUPDATE then
+  local ServerData = GetWebResult(UPDATE_HOST, "/MarToxAk/SorakaBot1.0/master/sorakabot.version")
+  if ServerData then
+    ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
+    if ServerVersion then
+      if tonumber(version) < ServerVersion then
+        AutoupdaterMsg("New version available"..ServerVersion)
+        AutoupdaterMsg("Updating, please don't press F9")
+        DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () AutoupdaterMsg("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
       else
-        PrintChat("<font color=\"#81BEF7\" >UnifiedSoraka:</font> <font color=\"#FF0000\">Error updating to new version (v"..Version..")</font>")
-      end
-      elseif (Version ~= nil) and (Version == tonumber(version)) then
-        PrintChat("<font color=\"#81BEF7\" >UnifiedSoraka:</font> <font color=\"#00FF00\">No updates found, latest version: v"..Version.." </font>")
+        AutoupdaterMsg("You have got the latest version ("..ServerVersion..")")
       end
     end
+  else
+    AutoupdaterMsg("Error downloading version info")
   end
 end
 -- Constants (do not change)
