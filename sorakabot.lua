@@ -1,9 +1,8 @@
-
--- Champion Check
+if myHero.charName ~="soraka" then return 
+end
 local version = "0.4"
 local TESTVERSION = false
 local AUTOUPDATE = true
-require 'VPrediction'
 local UPDATE_HOST = "raw.github.com"
 local UPDATE_PATH = "/MarToxAk/SorakaBot1.0/master/sorakabot.lua".."?rand="..math.random(1,10000)
 local UPDATE_FILE_PATH = LIB_PATH.."sorakabot.lua"
