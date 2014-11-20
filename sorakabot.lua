@@ -1,48 +1,30 @@
---Inicio Complicado  Mais vamos
 local version = "0.1"
 
---requerido  esse Pluguin
 require 'VPrediction'
+--[[
+Soraka Rw  By MarTox
+Soraka com Auto Compra
+Auto Up Skiil
+--]]
 
---Scrip para o  chapm abaixo
-if myHero.charName ~="soraka" then return 
-end
---fim
---Shop Itens Ainda a modifica
-ShopList = {
-  3301,
-  3340,
-  1004,1004,
-  3096,
-  3114,
-  3069,
-  1001,
-  3108,
-  3174,
-  1028,
-  1057,
-  3105,
-  3158,
-  1011,
-  3190,
-  3143,
-  3275,
-  1058,
-  3089
+-- Champion Check
+if myHero.charName ~= "Soraka" then return end
+
+shopList = {
+2037, 2037, 2037
 }
---Fim do shop itens
 
-nextbuyIndex = 1 
+nextbuyIndex = 1
 lastBuy = 0
 
-buyDelay = 100 --padrão 100
+buyDelay = 100 --default 100
 
---sistema de update
+--UPDATE SETTINGS
 local AutoUpdate = true
-local SELF = SCRIPT_PATH..GetCurrentEnv() .FILE_NAME
-local URL = "https://raw.githubusercontent.com/victorgrego/Bol/master/"..math.random(100)
+local SELF = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
+local URL = "https://raw.githubusercontent.com/MarToxAk/SorakaBot1.0/master/sorakabot.lua?"..math.random(100)
 local UPDATE_TMP_FILE = LIB_PATH.."UNSTmp.txt"
-local versionmessage = "<font color=\"#51BEF7\" >Changelog: </font>"
+local versionmessage = "<font color=\"#81BEF7\" >Changelog: Added autobuy option and changed build to spam skills</font>"
 
 function Update()
   DownloadFile(URL, UPDATE_TMP_FILE, UpdateCallback)
@@ -77,10 +59,8 @@ function UpdateCallback()
       end
     end
   end
-end  
-
-
---teste   
+end
+-- Constants (do not change)
 local GLOBAL_RANGE = 0
 local NO_RESOURCE = 0
 local DEFAULT_STARCALL_MODE = 3
@@ -91,7 +71,7 @@ local DEFAULT_HEAL_THRESHOLD = 75 -- for healMode 3, default 75 (75%)
 local DEFAULT_INFUSE_MODE = 2 
 local DEFAULT_MIN_ALLY_SILENCE = 70 -- percentage of mana nearby ally lolshould have before soraka uses silence
 local DEFAULT_ULT_MODE = 2
-local DEFAULT_ULT_THRESHOLD = 35 --percentage of hp soraka/ally/team must be at or missing for ult, eg 10 (10%)
+local DEFAULT_ULT_THRESHOLD = 35 --perceantage of hp soraka/ally/team must be at or missing for ult, eg 10 (10%)
 local DEFAULT_DENY_THRESHOLD = 75
 local DEFAULT_STEAL_THRESHOLD = 60
 local MAX_PLAYER_AA_RANGE = 850
@@ -100,17 +80,40 @@ local HL_slot = nil
 local CL_slot = nil
 local DEFAULT_MANA_CLARITY = 50
 
---recal Check
+-- Recall Check
 local isRecalling = false
-local RECAL_DELAY = 0.5
+local RECALL_DELAY = 0.5
 
 -- Auto Level
 local levelSequence = {_W,_E,_Q,_W,_W,_R,_W,_E,_W,_E,_R,_E,_E,_Q,_Q,_R,_Q,_Q}
 
---target Selector
+--Target Selector
 ts = TargetSelector(TARGET_LOW_HP, 1000, DAMAGE_MAGIC, true)
 
---teste  2 ...
+--[[ ultMode notes:
+1 = ult when Soraka is low/about to die, under ultThreshold% of hp [selfish ult]
+2 = ult when ally is low/about to die, under ultThreshold% of hp [lane partner ult]
+3 = ult when total missing health of entire team exceeds ultThreshold (ie 50% of entire team health is missing)
+-]]
+
+--[[ Main Functions ]]--
+
+-- Soraka performs starcall to help push/farm a lane or harrass enemy champions (or both)
+
+
+-- Soraka Heals the nearby most injured ally or herself, assumes heal is ready to be used
+
+
+
+
+-- Soraka Infuses the most mana deprived ally donating them mana
+
+
+--[[ Helper Functions ]]--
+
+
+--[[ Helper Functions ]]--
+-- Return player based on their resource or stat
 function GetPlayer(team, includeDead, includeSelf, distanceTo, distanceAmount, resource)
   local target = nil
 
@@ -139,8 +142,6 @@ function GetPlayer(team, includeDead, includeSelf, distanceTo, distanceAmount, r
   return target
 end
 
-
---compra de itens
 function buy()
   if InFountain() or player.dead then
       -- Item purchases
@@ -164,7 +165,7 @@ function buy()
   end
 end
 
---Draws menu
+--draws Menu
 function drawMenu()
   -- Config Menu
   config = scriptConfig("UnifiedSoraka", "UnifiedSoraka") 
@@ -175,7 +176,8 @@ function drawMenu()
 
 end
 
--- teste 3
+
+-- obCreatObj
 function OnCreateObj(obj)
   -- Check if player is recalling and set isrecalling
   if obj.name:find("TeleportHome") then
@@ -185,7 +187,7 @@ function OnCreateObj(obj)
   end
 end
 
---teste 4
+-- OnDeleteObj
 function OnDeleteObj(obj)
   if obj.name:find("TeleportHome") then
     -- Set isRecalling off after short delay to prevent using abilities once at base
@@ -193,6 +195,7 @@ function OnDeleteObj(obj)
   end
 end
 
+--[[ OnTick ]]--
 function OnTick()
   ts:update()
   --if(ts.target) then print(ts.target.charName) end
@@ -210,7 +213,6 @@ function OnTick()
 
 end
 
---teste op esse linhas ficam por ultimo
 function OnLoad()
   player = GetMyHero()
   drawMenu()
