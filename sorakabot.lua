@@ -1,5 +1,5 @@
 require 'VPrediction'
-local version = "0.4"
+local version = "0.5"
 local TESTVERSION = false
 local AUTOUPDATE = true
 local UPDATE_HOST = "raw.github.com"
@@ -138,6 +138,7 @@ function drawMenu()
   config:addParam("enableScript", "Enable Script", SCRIPT_PARAM_ONOFF, true)
   config:addParam("autoBuy", "Auto Buy Items", SCRIPT_PARAM_ONOFF, true)
   config:addParam("autoLevel", "Auto Level", SCRIPT_PARAM_ONOFF, true)
+  config:addParam("","Teste", SCRIPT_PARAM_ONOFF, true)
 
 end
 
