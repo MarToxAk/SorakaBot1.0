@@ -1,6 +1,5 @@
-if myHero.charName ~="soraka" then return 
-end
-local version = "0.4"
+require 'VPrediction'
+local version = "0.3"
 local TESTVERSION = false
 local AUTOUPDATE = true
 local UPDATE_HOST = "raw.github.com"
@@ -8,7 +7,7 @@ local UPDATE_PATH = "/MarToxAk/SorakaBot1.0/master/sorakabot.lua".."?rand="..mat
 local UPDATE_FILE_PATH = LIB_PATH.."sorakabot.lua"
 local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
 
-local function AutoupdaterMsg(msg) print("<font color=\"#6699ff\"><b>VPrediction:</b></font> <font color=\"#FFFFFF\">"..msg..".</font>") end
+local function AutoupdaterMsg(msg) print("<font color=\"#6699ff\"><b>Soraka:</b></font> <font color=\"#FFFFFF\">"..msg..".</font>") end
 if AUTOUPDATE then
   local ServerData = GetWebResult(UPDATE_HOST, "/MarToxAk/SorakaBot1.0/master/sorakabot.version")
   if ServerData then
